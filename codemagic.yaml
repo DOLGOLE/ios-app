@@ -1,6 +1,6 @@
 workflows:
-  ios_app_build:
-    name: iOS APP Build (Guaranteed)
+  ios_ipa_build:
+    name: iOS IPA Build (Sideload Ready)
 
     max_build_duration: 60
 
@@ -14,16 +14,9 @@ workflows:
           flutter clean
           flutter pub get
 
-      - name: Force disable signing via Flutter config
+      - name: Build IPA (unsigned allowed)
         script: |
-          export CODE_SIGNING_ALLOWED=NO
-          export CODE_SIGNING_REQUIRED=NO
-          export CODE_SIGN_IDENTITY=""
-
-      - name: Build iOS app (no codesign)
-        script: |
-          flutter build ios --release --no-codesign
+          flutter build ipa --release --no-codesign
 
     artifacts:
-      - build/ios/iphoneos/Runner.app
-      - build/ios/iphoneos/*.app
+      - build/ios/ipa/*.ipa
