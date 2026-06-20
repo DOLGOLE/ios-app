@@ -1,6 +1,6 @@
 workflows:
-  ios-test:
-    name: iOS SideStore Build
+  ios_unsigned_app:
+    name: iOS Unsigned .app Build
 
     max_build_duration: 60
 
@@ -9,23 +9,20 @@ workflows:
       xcode: latest
 
     scripts:
-      - name: Flutter Doctor
-        script: |
-          flutter doctor -v
-
-      - name: Get packages
+      - name: Get Flutter packages
         script: |
           flutter pub get
 
-      - name: Check iOS project
+      - name: Clean iOS pods
         script: |
-          ls -R ios
-          xcodebuild -list -project ios/Runner.xcodeproj
+          cd ios
+          pod install
+          cd ..
 
-      - name: Build IPA
+      - name: Build iOS app (NO CODESIGN)
         script: |
-          flutter build ipa
+          flutter build ios --release --no-codesign
 
     artifacts:
-      - build/ios/ipa/*.ipa
-      - build/ios/archive/*.xcarchive
+      - build/ios/iphoneos/*.app
+      - build/ios/iphoneos/Runner.app
