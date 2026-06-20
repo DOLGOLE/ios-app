@@ -1,6 +1,6 @@
 workflows:
-  ios_unsigned:
-    name: iOS Unsigned Build (APP only)
+  ios_app_build:
+    name: iOS APP Build (Guaranteed)
 
     max_build_duration: 60
 
@@ -9,30 +9,21 @@ workflows:
       xcode: latest
 
     scripts:
-      - name: Clean project
+      - name: Clean
         script: |
           flutter clean
           flutter pub get
 
-      - name: Remove ALL iOS signing
+      - name: Force disable signing via Flutter config
         script: |
-          cd ios
+          export CODE_SIGNING_ALLOWED=NO
+          export CODE_SIGNING_REQUIRED=NO
+          export CODE_SIGN_IDENTITY=""
 
-          # DEVELOPMENT_TEAM 완전 제거
-          find . -name project.pbxproj -exec sed -i '' 's/DEVELOPMENT_TEAM = .*;//g' {} \;
-
-          # 자동 서명 제거
-          find . -name project.pbxproj -exec sed -i '' 's/ProvisioningStyle = Automatic;/ProvisioningStyle = Manual;/g' {} \;
-
-          # CODE_SIGNING_ALLOWED 완전 비활성화
-          find . -name project.pbxproj -exec sed -i '' 's/CODE_SIGNING_ALLOWED = YES;/CODE_SIGNING_ALLOWED = NO;/g' {} \;
-
-          cd ..
-
-      - name: Build iOS app (NO SIGN)
+      - name: Build iOS app (no codesign)
         script: |
           flutter build ios --release --no-codesign
 
     artifacts:
-      - build/ios/iphoneos/*.app
       - build/ios/iphoneos/Runner.app
+      - build/ios/iphoneos/*.app
